@@ -1,0 +1,28 @@
+
+#include "MySocketServer.h"
+#include "MySocketClient.h"
+
+#include <QDebug>
+#include <stdlib.h>
+
+int nb=0;
+
+MySocketServer::MySocketServer(QObject *parent)
+    : QTcpServer(parent)
+{
+}
+
+void MySocketServer::incomingConnection(int socketDescriptor)
+{
+
+    cout << socketDescriptor<<" - (II) Launching the Network monitor process" << endl;
+    MySocketClient *thread = new MySocketClient(socketDescriptor, this);
+
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    thread->start();
+    nb++;
+    cout << socketDescriptor<<" - (II) Network monitor process launch : OK" << endl;
+    //if(thread->isFinished()) nb--;
+
+    qDebug()<<"nb : "<<nb;
+}
